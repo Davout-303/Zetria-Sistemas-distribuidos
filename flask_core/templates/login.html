@@ -1,0 +1,228 @@
+{% extends "base.html" %}
+
+{% block title %}Login - Zetria{% endblock %}
+
+{% block extra_css %}
+<style>
+.login-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.login-card {
+    width: 100%;
+    max-width: 400px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 40px;
+    backdrop-filter: blur(20px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.login-header {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.login-header .logo {
+    font-size: 48px;
+    color: #ffcc00;
+    margin-bottom: 16px;
+}
+
+.login-header h1 {
+    font-size: 28px;
+    margin-bottom: 8px;
+    background: linear-gradient(135deg, #ffcc00 0%, #ff9900 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.login-header p {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 16px;
+}
+
+.login-form {
+    margin-bottom: 24px;
+}
+
+.form-group {
+    position: relative;
+    margin-bottom: 24px;
+}
+
+.form-group i {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: rgba(255, 255, 255, 0.5);
+    z-index: 1;
+}
+
+.form-control {
+    padding-left: 48px;
+    height: 52px;
+}
+
+.login-actions {
+    margin-bottom: 24px;
+}
+
+.login-actions .btn {
+    width: 100%;
+    height: 52px;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.login-footer {
+    text-align: center;
+    padding-top: 24px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.login-footer a {
+    color: #ffcc00;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.login-footer a:hover {
+    color: #ffdd33;
+}
+
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.loading-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.loading-content {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 24px;
+    border-radius: 12px;
+    text-align: center;
+    backdrop-filter: blur(10px);
+}
+
+@media (max-width: 480px) {
+    .login-card {
+        padding: 32px 24px;
+    }
+    
+    .login-header h1 {
+        font-size: 24px;
+    }
+    
+    .login-header .logo {
+        font-size: 40px;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="login-container">
+    <div class="login-card">
+        <div class="login-header">
+            <div class="logo">
+                <i class="fas fa-bee"></i>
+            </div>
+            <h1>Bem-vindo ao Zetria</h1>
+            <p>Faça login para continuar</p>
+        </div>
+        
+        <form class="login-form" method="POST" action="{{ url_for('login') }}" id="loginForm">
+            <div class="form-group">
+                <i class="fas fa-user"></i>
+                <input 
+                    type="text" 
+                    name="username" 
+                    class="form-control" 
+                    placeholder="Nome de usuário"
+                    required
+                    autocomplete="username"
+                >
+            </div>
+            
+            <div class="form-group">
+                <i class="fas fa-lock"></i>
+                <input 
+                    type="password" 
+                    name="password" 
+                    class="form-control" 
+                    placeholder="Senha"
+                    required
+                    autocomplete="current-password"
+                >
+            </div>
+            
+            <div class="login-actions">
+                <button type="submit" class="btn btn-primary" id="loginBtn">
+                    <i class="fas fa-sign-in-alt"></i>
+                    Entrar
+                </button>
+            </div>
+        </form>
+        
+        <div class="login-footer">
+            <p>Não possui uma conta? <a href="{{ url_for('cadastro') }}">Cadastre-se aqui</a></p>
+        </div>
+    </div>
+</div>
+
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-content">
+        <div class="spinner"></div>
+        <p style="margin-top: 16px;">Fazendo login...</p>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('loginForm');
+    const loginBtn = document.getElementById('loginBtn');
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    
+    form.addEventListener('submit', function(e) {
+        // Mostrar loading
+        loadingOverlay.classList.add('active');
+        loginBtn.disabled = true;
+        
+        
+    });
+    
+    // Remover loading se houver erro (página recarrega)
+    window.addEventListener('load', function() {
+        loadingOverlay.classList.remove('active');
+        loginBtn.disabled = false;
+    });
+});
+</script>
+{% endblock %}
+

@@ -1,0 +1,148 @@
+
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #2b2b3f;
+    display: flex;
+    color: #fff;
+    height: 100vh;
+    position: relative;
+    background-color: var(--bg-color-01); 
+    overflow: hidden;
+}
+
+.main-content {
+    flex: 1;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #2b2b3f;
+    flex-direction: column; 
+    justify-content: flex-start; 
+}
+
+.title {
+    text-align: center;
+    margin-bottom: 10px;
+    color: #FFE600;
+    margin-bottom: 1rem;
+}
+
+#botoes {
+    display: flex; 
+    justify-content: center; 
+    gap: 15px;
+}
+
+
+.action-button {
+    padding: 12px 25px;
+    background-color: #ffcc0077;
+    color: rgb(238, 229, 229);
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: bold;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    transition: all 0.3s ease;
+    flex: 1; 
+    max-width: 200px;
+    text-align: center;
+}
+
+
+/* Estilos para os modais */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+}
+
+.modal-content {
+    background-color: #2a2a2a;
+    margin: 10% auto;
+    padding: 20px;
+    border-radius: 8px;
+    width: 50%;
+    max-width: 500px;
+    color: white;
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close:hover {
+    color: white;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+    width: 100%;
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid #444;
+    background-color: #333;
+    color: white;
+}
+
+.form-group textarea {
+    resize: vertical;
+}
+
+.search-results {
+    max-height: 200px;
+    overflow-y: auto;
+    margin-top: 5px;
+    border: 1px solid #444;
+    border-radius: 4px;
+    display: none;
+}
+
+.search-result-item {
+    padding: 8px;
+    cursor: pointer;
+    border-bottom: 1px solid #444;
+}
+
+.search-result-item:hover {
+    background-color: #3a3a3a;
+}
+
+.search-result-item:last-child {
+    border-bottom: none;
+}
+#graph {
+    width: 90vw;
+    height: 88vh;
+    border: 4px solid var(--text-color-01);
+    background-color: var(--bg-color-01);
+    border-radius: 8px;
+  }

@@ -1,0 +1,1583 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Zetria API",
+    "description": "API para o sistema de gerenciamento de notas Zetria",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:5000",
+      "description": "Servidor de desenvolvimento"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Autenticação",
+      "description": "Operações de login e gerenciamento de sessão"
+    },
+    {
+      "name": "Notas",
+      "description": "Operações CRUD para gerenciamento de notas"
+    },
+    {
+      "name": "Flashcards",
+      "description": "Operações CRUD para gerenciamento de flashcards"
+    },
+    {
+      "name": "Tarefas",
+      "description": "Operações CRUD para gerenciamento de tarefas"
+    },
+    {
+      "name": "Usuários",
+      "description": "Operações CRUD para gerenciamento de usuários"
+    }
+  ],
+  "paths": {
+    "/login": {
+      "post": {
+        "tags": ["Autenticação"],
+        "summary": "Efetuar login",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string",
+                    "example": "usuario123"
+                  },
+                  "password": {
+                    "type": "string",
+                    "example": "senhaSegura123"
+                  }
+                },
+                "required": ["username", "password"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "302": {
+            "description": "Redireciona para o dashboard após login bem-sucedido"
+          },
+          "200": {
+            "description": "Retorna a página de login",
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/logout": {
+      "get": {
+        "tags": ["Autenticação"],
+        "summary": "Efetuar logout",
+        "responses": {
+          "302": {
+            "description": "Redireciona para a página de login após logout"
+          }
+        }
+      }
+    },
+    "/api/notas": {
+      "get": {
+        "tags": ["Notas"],
+        "summary": "Listar todas as notas do usuário",
+        "responses": {
+          "200": {
+            "description": "Lista de notas retornada com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "notas": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Nota"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro no servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [{"SessionAuth": []}]
+      },
+      "post": {
+        "tags": ["Notas"],
+        "summary": "Criar uma nova nota",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "description": "Título da nota",
+                    "example": "Minha Primeira Nota"
+                  },
+                  "content": {
+                    "type": "string",
+                    "description": "Conteúdo da nota",
+                    "example": "Este é o conteúdo da minha nota com [[links]] e #tags"
+                  }
+                },
+                "required": ["title"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Nota criada com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "note_id": {
+                      "type": "integer",
+                      "example": 42
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Nota criada com sucesso"
+                    },
+                    "note": {
+                      "$ref": "#/components/schemas/Nota"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro no servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [{"SessionAuth": []}]
+      }
+    },
+    "/api/notas/{note_id}": {
+      "get": {
+        "tags": ["Notas"],
+        "summary": "Obter detalhes de uma nota específica",
+        "parameters": [
+          {
+            "name": "note_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Detalhes da nota retornados com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "nota": {
+                      "$ref": "#/components/schemas/NotaCompleta"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nota não encontrada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro no servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [{"SessionAuth": []}]
+      },
+      "put": {
+        "tags": ["Notas"],
+        "summary": "Atualizar uma nota existente",
+        "parameters": [
+          {
+            "name": "note_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "description": "Novo título da nota"
+                  },
+                  "content": {
+                    "type": "string",
+                    "description": "Novo conteúdo da nota"
+                  }
+                },
+                "required": ["title"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Nota atualizada com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Nota atualizada com sucesso"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nota não encontrada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro no servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [{"SessionAuth": []}]
+      },
+      "delete": {
+        "tags": ["Notas"],
+        "summary": "Excluir uma nota",
+        "parameters": [
+          {
+            "name": "note_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Nota excluída com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Nota excluída com sucesso"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nota não encontrada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro no servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [{"SessionAuth": []}]
+      }
+    },
+    "/api/flashcards": {
+      "get": {
+        "tags": ["Flashcards"],
+        "summary": "Listar flashcards",
+        "parameters": [
+          {
+            "name": "nota_id",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Filtrar por ID da nota relacionada"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de flashcards retornada com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "flashcards": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Flashcard"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro no servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [{"SessionAuth": []}]
+      },
+      "post": {
+        "tags": ["Flashcards"],
+        "summary": "Criar um novo flashcard",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "nota_id": {
+                    "type": "integer",
+                    "description": "ID da nota relacionada"
+                  },
+                  "front_content": {
+                    "type": "string",
+                    "description": "Conteúdo da frente do flashcard"
+                  },
+                  "back_content": {
+                    "type": "string",
+                    "description": "Conteúdo do verso do flashcard"
+                  },
+                  "audio_path": {
+                    "type": "string",
+                    "description": "Caminho para arquivo de áudio (opcional)"
+                  }
+                },
+                "required": ["nota_id", "front_content", "back_content"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Flashcard criado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "flashcard_id": {
+                      "type": "integer",
+                      "example": 1
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Flashcard criado com sucesso"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nota relacionada não encontrada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro no servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [{"SessionAuth": []}]
+      }
+    },
+    "/api/flashcards/{flashcard_id}": {
+      "get": {
+        "tags": ["Flashcards"],
+        "summary": "Obter detalhes de um flashcard específico",
+        "parameters": [
+          {
+            "name": "flashcard_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Detalhes do flashcard retornados com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "flashcard": {
+                      "$ref": "#/components/schemas/Flashcard"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Flashcard não encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro no servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [{"SessionAuth": []}]
+      },
+      "put": {
+        "tags": ["Flashcards"],
+        "summary": "Atualizar um flashcard existente",
+        "parameters": [
+          {
+            "name": "flashcard_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "front_content": {
+                    "type": "string",
+                    "description": "Novo conteúdo da frente"
+                  },
+                  "back_content": {
+                    "type": "string",
+                    "description": "Novo conteúdo do verso"
+                  },
+                  "audio_path": {
+                    "type": "string",
+                    "description": "Novo caminho para áudio"
+                  },
+                  "review_at": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "Data de próxima revisão"
+                  }
+                },
+                "required": ["front_content", "back_content"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Flashcard atualizado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Flashcard atualizado com sucesso"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Flashcard não encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro no servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [{"SessionAuth": []}]
+      },
+      "delete": {
+        "tags": ["Flashcards"],
+        "summary": "Excluir um flashcard",
+        "parameters": [
+          {
+            "name": "flashcard_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Flashcard excluído com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Flashcard excluído com sucesso"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Flashcard não encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro no servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [{"SessionAuth": []}]
+      }
+    },
+    "/api/tasks": {
+      "get": {
+        "tags": ["Tarefas"],
+        "summary": "Listar tarefas do usuário",
+        "responses": {
+          "200": {
+            "description": "Lista de tarefas retornada com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "tasks": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Task"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro no servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [{"SessionAuth": []}]
+      },
+      "post": {
+        "tags": ["Tarefas"],
+        "summary": "Criar uma nova tarefa",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "description": "Título da tarefa"
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "Descrição detalhada"
+                  },
+                  "due_date": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "Data de vencimento"
+                  },
+                  "recurring": {
+                    "type": "boolean",
+                    "description": "Se a tarefa é recorrente"
+                  },
+                  "recurrence_rule": {
+                    "type": "string",
+                    "description": "Regra de recorrência (cron expression)"
+                  }
+                },
+                "required": ["title"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Tarefa criada com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "task_id": {
+                      "type": "integer",
+                      "example": 1
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Tarefa criada com sucesso"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro no servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [{"SessionAuth": []}]
+      }
+    },
+    "/api/tasks/{task_id}": {
+      "get": {
+        "tags": ["Tarefas"],
+        "summary": "Obter detalhes de uma tarefa específica",
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Detalhes da tarefa retornados com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "task": {
+                      "$ref": "#/components/schemas/Task"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Tarefa não encontrada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro no servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [{"SessionAuth": []}]
+      },
+      "put": {
+        "tags": ["Tarefas"],
+        "summary": "Atualizar uma tarefa existente",
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "description": "Novo título da tarefa"
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "Nova descrição"
+                  },
+                  "due_date": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "Nova data de vencimento"
+                  },
+                  "recurring": {
+                    "type": "boolean",
+                    "description": "Se a tarefa é recorrente"
+                  },
+                  "recurrence_rule": {
+                    "type": "string",
+                    "description": "Nova regra de recorrência"
+                  },
+                  "completed": {
+                    "type": "boolean",
+                    "description": "Status de conclusão"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Tarefa atualizada com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Tarefa atualizada com sucesso"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Tarefa não encontrada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro no servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [{"SessionAuth": []}]
+      },
+      "delete": {
+        "tags": ["Tarefas"],
+        "summary": "Excluir uma tarefa",
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Tarefa excluída com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Tarefa excluída com sucesso"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Tarefa não encontrada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro no servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [{"SessionAuth": []}]
+      }
+    },
+    "/api/usuarios": {
+      "get": {
+        "tags": ["Usuários"],
+        "summary": "Listar todos os usuários (apenas admin)",
+        "responses": {
+          "200": {
+            "description": "Lista de usuários retornada com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "usuarios": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Usuario"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Acesso negado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro no servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [{"SessionAuth": []}]
+      }
+    },
+    "/api/usuarios/{user_id}": {
+      "get": {
+        "tags": ["Usuários"],
+        "summary": "Obter detalhes de um usuário específico",
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Detalhes do usuário retornados com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "usuario": {
+                      "$ref": "#/components/schemas/Usuario"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Acesso negado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Usuário não encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro no servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [{"SessionAuth": []}]
+      },
+      "put": {
+        "tags": ["Usuários"],
+        "summary": "Atualizar um usuário (apenas o próprio usuário ou admin)",
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string",
+                    "description": "Novo nome de usuário"
+                  },
+                  "password": {
+                    "type": "string",
+                    "description": "Nova senha (opcional)"
+                  }
+                },
+                "required": ["username"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Usuário atualizado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Perfil atualizado com sucesso"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Acesso negado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Usuário não encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro no servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [{"SessionAuth": []}]
+      },
+      "delete": {
+        "tags": ["Usuários"],
+        "summary": "Excluir um usuário (apenas o próprio usuário ou admin)",
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Usuário excluído com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Conta excluída com sucesso"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Acesso negado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Usuário não encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro no servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [{"SessionAuth": []}]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Nota": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "user_id": {
+            "type": "integer",
+            "example": 1
+          },
+          "title": {
+            "type": "string",
+            "example": "Minha Primeira Nota"
+          },
+          "content": {
+            "type": "string",
+            "example": "Conteúdo da nota..."
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2023-07-15T10:30:00Z"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2023-07-15T10:30:00Z"
+          }
+        }
+      },
+      "NotaCompleta": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Nota"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "tags": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "example": "importante"
+                }
+              },
+              "linked_notes": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer",
+                      "example": 2
+                    },
+                    "title": {
+                      "type": "string",
+                      "example": "Nota Relacionada"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "Flashcard": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "nota_id": {
+            "type": "integer",
+            "example": 1
+          },
+          "front_content": {
+            "type": "string",
+            "example": "Qual a capital da França?"
+          },
+          "back_content": {
+            "type": "string",
+            "example": "Paris"
+          },
+          "audio_path": {
+            "type": "string",
+            "nullable": true,
+            "example": "/audio/franca.mp3"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2023-07-15T10:30:00Z"
+          },
+          "review_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "example": "2023-07-20T10:30:00Z"
+          }
+        }
+      },
+      "Task": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "user_id": {
+            "type": "integer",
+            "example": 1
+          },
+          "title": {
+            "type": "string",
+            "example": "Reunião com cliente"
+          },
+          "description": {
+            "type": "string",
+            "example": "Discutir requisitos do projeto"
+          },
+          "due_date": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2023-07-20T14:00:00Z"
+          },
+          "recurring": {
+            "type": "boolean",
+            "example": false
+          },
+          "recurrence_rule": {
+            "type": "string",
+            "nullable": true,
+            "example": "0 9 * * 1"
+          },
+          "completed": {
+            "type": "boolean",
+            "example": false
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2023-07-15T10:30:00Z"
+          }
+        }
+      },
+      "Usuario": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "username": {
+            "type": "string",
+            "example": "usuario123"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2023-07-10T08:15:00Z"
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": false
+          },
+          "error": {
+            "type": "string",
+            "example": "Mensagem de erro detalhada"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "SessionAuth": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "session"
+      }
+    }
+  }
+}

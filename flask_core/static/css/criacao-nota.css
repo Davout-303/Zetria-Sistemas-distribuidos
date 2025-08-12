@@ -1,0 +1,140 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  display: flex;
+  color: #ffcc00;
+  min-height: 100vh;
+  position: relative;
+  background-color: #1e1e2f;
+}
+.title{
+  margin: 2rem;
+}
+.main-content {
+    flex: 1;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #1b1a1d;
+    flex-direction: column;  
+    justify-content: flex-start; 
+}
+
+#editor-container {
+  max-width: 800px;
+  margin: 0 auto;
+  position: relative;
+}
+
+#editor {
+  min-height: 100vh;
+  width: 60vw;
+  padding: 20px;
+  background-color: #1e1e2e;
+  color: #fff;
+  caret-color: #cdd6f4;
+  border: none;
+  outline: none;
+  font-size: 16px;
+  line-height: 1.6;
+  resize: none;
+  position: relative;
+  z-index: 2;
+}
+
+#salvar-btn {
+  margin-top: 20px;
+  padding: 12px 24px;
+  background-color: #ffcc00;
+  color: #1b1a1d;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+#salvar-btn:hover {
+  background-color: #e6b800;
+  transform: scale(1.05);
+}
+
+#preview {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  padding: 20px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+
+#preview strong {
+  color: #f38ba8;
+  font-weight: bold;
+}
+
+#preview em {
+  color: #94e2d5;
+  font-style: italic;
+}
+
+#preview h1,
+#preview h2,
+#preview h3 {
+  color: #89b4fa;
+  margin: 24px 0 16px 0;
+}
+
+#preview h1 {
+  font-size: 2em;
+  border-bottom: 1px solid #313244;
+  padding-bottom: 8px;
+}
+
+#preview h2 {
+  font-size: 1.5em;
+}
+
+#preview pre {
+  background-color: #313244;
+  padding: 16px;
+  border-radius: 8px;
+  overflow-x: auto;
+}
+
+#preview code {
+  font-family: monospace;
+  background-color: #313244;
+  padding: 2px 4px;
+  border-radius: 4px;
+}
+
+#preview blockquote {
+  border-left: 4px solid #89b4fa;
+  padding-left: 16px;
+  margin-left: 0;
+  color: #a6adc8;
+}
+
+#preview ul,
+#preview ol {
+  padding-left: 24px;
+  margin: 16px 0;
+}
+
+#preview hr {
+  border: none;
+  border-top: 1px solid #313244;
+  margin: 24px 0;
+}
+

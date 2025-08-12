@@ -1,0 +1,780 @@
+{% extends "base.html" %}
+
+{% block title %}
+{% if nota_id %}Editar Nota{% else %}Nova Nota{% endif %} - Zetria
+{% endblock %}
+
+{% block navbar %}
+{% include 'partials/navbar.html' %}
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.nota-container {
+    padding: 40px 0;
+}
+
+.nota-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32px;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.nota-title {
+    font-size: 32px;
+    font-weight: 600;
+    background: linear-gradient(135deg, #ffcc00 0%, #ff9900 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.nota-actions {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.editor-container {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 32px;
+    backdrop-filter: blur(10px);
+    margin-bottom: 32px;
+}
+
+.form-group {
+    margin-bottom: 24px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #ffcc00;
+    font-size: 16px;
+}
+
+.title-input {
+    width: 100%;
+    height: 56px;
+    padding: 16px 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    color: #ffffff;
+    font-size: 18px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.title-input:focus {
+    outline: none;
+    border-color: #ffcc00;
+    background: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 0 0 4px rgba(255, 204, 0, 0.1);
+}
+
+.title-input::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.content-input {
+    width: 100%;
+    min-height: 400px;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    color: #ffffff;
+    font-size: 16px;
+    line-height: 1.6;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    resize: vertical;
+    transition: all 0.3s ease;
+}
+
+.content-input:focus {
+    outline: none;
+    border-color: #ffcc00;
+    background: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 0 0 4px rgba(255, 204, 0, 0.1);
+}
+
+.content-input::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.editor-toolbar {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+}
+
+.toolbar-btn {
+    padding: 8px 12px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.toolbar-btn:hover {
+    background: rgba(255, 204, 0, 0.1);
+    border-color: rgba(255, 204, 0, 0.3);
+    color: #ffcc00;
+}
+
+.editor-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.char-count {
+    display: flex;
+    gap: 16px;
+}
+
+.tags-preview {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+}
+
+.tag-preview {
+    padding: 4px 8px;
+    background: rgba(255, 204, 0, 0.2);
+    border: 1px solid rgba(255, 204, 0, 0.3);
+    border-radius: 12px;
+    color: #ffcc00;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.form-actions {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.form-actions .btn {
+    min-width: 120px;
+    height: 48px;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.preview-container {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 32px;
+    backdrop-filter: blur(10px);
+    margin-bottom: 32px;
+    display: none;
+}
+
+.preview-content {
+    color: #ffffff;
+    line-height: 1.6;
+}
+
+.preview-content h1,
+.preview-content h2,
+.preview-content h3 {
+    color: #ffcc00;
+    margin-bottom: 16px;
+}
+
+.preview-content p {
+    margin-bottom: 16px;
+}
+
+.preview-content code {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+}
+
+.preview-content pre {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 16px;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin-bottom: 16px;
+}
+
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.loading-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.loading-content {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 32px;
+    border-radius: 16px;
+    text-align: center;
+    backdrop-filter: blur(10px);
+    max-width: 300px;
+}
+
+.loading-content .spinner {
+    margin-bottom: 16px;
+}
+
+@media (max-width: 768px) {
+    .nota-container {
+        padding: 20px 0;
+    }
+    
+    .nota-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .nota-title {
+        font-size: 24px;
+        text-align: center;
+    }
+    
+    .nota-actions {
+        justify-content: center;
+    }
+    
+    .editor-container {
+        padding: 24px;
+    }
+    
+    .content-input {
+        min-height: 300px;
+    }
+    
+    .editor-toolbar {
+        justify-content: center;
+    }
+    
+    .editor-info {
+        flex-direction: column;
+        gap: 12px;
+        text-align: center;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .form-actions .btn {
+        width: 100%;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="nota-container">
+    <div class="container">
+        <div class="nota-header">
+            <h1 class="nota-title" id="pageTitle">
+                {% if nota_id %}Editar Nota{% else %}Nova Nota{% endif %}
+            </h1>
+            <div class="nota-actions">
+                <button class="btn btn-secondary" onclick="togglePreview()" id="previewBtn">
+                    <i class="fas fa-eye"></i>
+                    Visualizar
+                </button>
+                <a href="{{ url_for('listar_notas') }}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i>
+                    Voltar
+                </a>
+            </div>
+        </div>
+        
+        <div class="editor-container" id="editorContainer">
+            <form id="notaForm">
+                <div class="form-group">
+                    <label for="title">Título da Nota</label>
+                    <input 
+                        type="text" 
+                        id="title" 
+                        name="title" 
+                        class="title-input"
+                        placeholder="Digite o título da sua nota..."
+                        required
+                        maxlength="200"
+                    >
+                </div>
+                
+                <div class="form-group">
+                    <label for="content">Conteúdo</label>
+                    <div class="editor-toolbar">
+                        <button type="button" class="toolbar-btn" onclick="insertText('**', '**')" title="Negrito">
+                            <i class="fas fa-bold"></i>
+                            Negrito
+                        </button>
+                        <button type="button" class="toolbar-btn" onclick="insertText('*', '*')" title="Itálico">
+                            <i class="fas fa-italic"></i>
+                            Itálico
+                        </button>
+                        <button type="button" class="toolbar-btn" onclick="insertText('`', '`')" title="Código">
+                            <i class="fas fa-code"></i>
+                            Código
+                        </button>
+                        <button type="button" class="toolbar-btn" onclick="insertText('#', '')" title="Hashtag">
+                            <i class="fas fa-hashtag"></i>
+                            Tag
+                        </button>
+                        <button type="button" class="toolbar-btn" onclick="insertText('[[', ']]')" title="Link para nota">
+                            <i class="fas fa-link"></i>
+                            Link
+                        </button>
+                    </div>
+                    <textarea 
+                        id="content" 
+                        name="content" 
+                        class="content-input"
+                        placeholder="Escreva o conteúdo da sua nota aqui...
+
+Dicas:
+• Use #tag para criar tags
+• Use [[título]] para linkar outras notas
+• Use **texto** para negrito
+• Use *texto* para itálico
+• Use `código` para destacar código"
+                        required
+                    ></textarea>
+                    
+                    <div class="editor-info">
+                        <div class="char-count">
+                            <span id="charCount">0 caracteres</span>
+                            <span id="wordCount">0 palavras</span>
+                        </div>
+                        <div class="tags-preview" id="tagsPreview">
+                            
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary" id="saveBtn">
+                        <i class="fas fa-save"></i>
+                        {% if nota_id %}Atualizar Nota{% else %}Salvar Nota{% endif %}
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="limparFormulario()">
+                        <i class="fas fa-eraser"></i>
+                        Limpar
+                    </button>
+                </div>
+            </form>
+        </div>
+        
+        <div class="preview-container" id="previewContainer">
+            <h3 style="color: #ffcc00; margin-bottom: 24px;">
+                <i class="fas fa-eye"></i>
+                Visualização da Nota
+            </h3>
+            <div class="preview-content" id="previewContent">
+               
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-content">
+        <div class="spinner"></div>
+        <p id="loadingText">Salvando nota...</p>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/zetria-api.js') }}"></script>
+<script>
+let notaAtual = null;
+let isEditMode = {% if nota_id %}true{% else %}false{% endif %};
+let notaId = {% if nota_id %}{{ nota_id }}{% else %}null{% endif %};
+let previewMode = false;
+
+document.addEventListener('DOMContentLoaded', function() {
+    configurarFormulario();
+    configurarContadores();
+    
+    if (isEditMode && notaId) {
+        carregarNota(notaId);
+    }
+});
+
+function configurarFormulario() {
+    const form = document.getElementById('notaForm');
+    form.addEventListener('submit', salvarNota);
+    
+   
+    setInterval(autoSave, 30000);
+    
+    
+    const titleInput = document.getElementById('title');
+    const contentInput = document.getElementById('content');
+    
+    titleInput.addEventListener('input', salvarRascunho);
+    contentInput.addEventListener('input', salvarRascunho);
+    
+    
+    recuperarRascunho();
+}
+
+function configurarContadores() {
+    const contentInput = document.getElementById('content');
+    
+    contentInput.addEventListener('input', function() {
+        atualizarContadores();
+        atualizarTagsPreview();
+    });
+    
+    atualizarContadores();
+}
+
+function atualizarContadores() {
+    const content = document.getElementById('content').value;
+    const charCount = content.length;
+    const wordCount = content.trim() ? content.trim().split(/\s+/).length : 0;
+    
+    document.getElementById('charCount').textContent = `${charCount} caracteres`;
+    document.getElementById('wordCount').textContent = `${wordCount} palavras`;
+}
+
+function atualizarTagsPreview() {
+    const content = document.getElementById('content').value;
+    const tags = extrairTags(content);
+    const tagsPreview = document.getElementById('tagsPreview');
+    
+    if (tags.length > 0) {
+        tagsPreview.innerHTML = `
+            <span style="color: rgba(255, 255, 255, 0.6); margin-right: 8px;">Tags:</span>
+            ${tags.map(tag => `<span class="tag-preview">#${tag}</span>`).join('')}
+        `;
+    } else {
+        tagsPreview.innerHTML = '';
+    }
+}
+
+async function carregarNota(id) {
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    const loadingText = document.getElementById('loadingText');
+    
+    loadingText.textContent = 'Carregando nota...';
+    loadingOverlay.classList.add('active');
+    
+    try {
+        const response = await api.obterNota(id);
+        if (response.success) {
+            notaAtual = response.nota;
+            
+            document.getElementById('title').value = notaAtual.title;
+            document.getElementById('content').value = notaAtual.content;
+            
+            atualizarContadores();
+            atualizarTagsPreview();
+            
+          
+            limparRascunho();
+        } else {
+            throw new Error(response.error || 'Erro ao carregar nota');
+        }
+    } catch (error) {
+        console.error('Erro ao carregar nota:', error);
+        mostrarNotificacao('Erro ao carregar nota: ' + error.message, 'error');
+        
+        // Redireciona para lista de notas em caso de erro
+        setTimeout(() => {
+            window.location.href = '/notas';
+        }, 2000);
+    } finally {
+        loadingOverlay.classList.remove('active');
+    }
+}
+
+async function salvarNota(event) {
+    event.preventDefault();
+    
+    const title = document.getElementById('title').value.trim();
+    const content = document.getElementById('content').value.trim();
+    
+    if (!title || !content) {
+        mostrarNotificacao('Por favor, preencha o título e o conteúdo da nota.', 'warning');
+        return;
+    }
+    
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    const loadingText = document.getElementById('loadingText');
+    const saveBtn = document.getElementById('saveBtn');
+    
+    loadingText.textContent = isEditMode ? 'Atualizando nota...' : 'Salvando nota...';
+    loadingOverlay.classList.add('active');
+    saveBtn.disabled = true;
+    
+    try {
+        const dados = { title, content };
+        let response;
+        
+        if (isEditMode && notaId) {
+            response = await api.atualizarNota(notaId, dados);
+        } else {
+            response = await api.criarNota(dados);
+        }
+        
+        if (response.success) {
+            mostrarNotificacao(
+                isEditMode ? 'Nota atualizada com sucesso!' : 'Nota criada com sucesso!', 
+                'success'
+            );
+            
+           
+            limparRascunho();
+            
+            // Se for nova nota, redireciona para edição
+            if (!isEditMode && response.nota) {
+                setTimeout(() => {
+                    window.location.href = `/notas/${response.nota.id}/editar`;
+                }, 1500);
+            }
+        } else {
+            throw new Error(response.error || 'Erro ao salvar nota');
+        }
+    } catch (error) {
+        console.error('Erro ao salvar nota:', error);
+        mostrarNotificacao('Erro ao salvar nota: ' + error.message, 'error');
+    } finally {
+        loadingOverlay.classList.remove('active');
+        saveBtn.disabled = false;
+    }
+}
+
+async function autoSave() {
+    if (!isEditMode || !notaId) return;
+    
+    const title = document.getElementById('title').value.trim();
+    const content = document.getElementById('content').value.trim();
+    
+    if (!title || !content) return;
+    
+    // Verifica se houve mudanças
+    if (notaAtual && title === notaAtual.title && content === notaAtual.content) {
+        return;
+    }
+    
+    try {
+        const dados = { title, content };
+        const response = await api.atualizarNota(notaId, dados);
+        
+        if (response.success) {
+            mostrarNotificacao('Nota salva automaticamente', 'info');
+            notaAtual = { ...notaAtual, title, content };
+        }
+    } catch (error) {
+        console.error('Erro no auto-save:', error);
+    }
+}
+
+function salvarRascunho() {
+    if (isEditMode) return; 
+    
+    const title = document.getElementById('title').value;
+    const content = document.getElementById('content').value;
+    
+    if (title || content) {
+        localStorage.setItem('zetria_rascunho', JSON.stringify({
+            title,
+            content,
+            timestamp: Date.now()
+        }));
+    }
+}
+
+function recuperarRascunho() {
+    if (isEditMode) return; 
+    
+    const rascunho = localStorage.getItem('zetria_rascunho');
+    if (rascunho) {
+        try {
+            const dados = JSON.parse(rascunho);
+            
+            // Verificar se o rascunho não é muito antigo (24 horas)
+            const agora = Date.now();
+            const umDia = 24 * 60 * 60 * 1000;
+            
+            if (agora - dados.timestamp < umDia) {
+                if (dados.title || dados.content) {
+                    const recuperar = confirm('Encontramos um rascunho não salvo. Deseja recuperá-lo?');
+                    if (recuperar) {
+                        document.getElementById('title').value = dados.title || '';
+                        document.getElementById('content').value = dados.content || '';
+                        atualizarContadores();
+                        atualizarTagsPreview();
+                    }
+                }
+            } else {
+                
+                localStorage.removeItem('zetria_rascunho');
+            }
+        } catch (error) {
+            console.error('Erro ao recuperar rascunho:', error);
+            localStorage.removeItem('zetria_rascunho');
+        }
+    }
+}
+
+function limparRascunho() {
+    localStorage.removeItem('zetria_rascunho');
+}
+
+function limparFormulario() {
+    if (confirm('Tem certeza que deseja limpar todo o conteúdo?')) {
+        document.getElementById('title').value = '';
+        document.getElementById('content').value = '';
+        atualizarContadores();
+        atualizarTagsPreview();
+        limparRascunho();
+    }
+}
+
+function insertText(before, after = '') {
+    const textarea = document.getElementById('content');
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selectedText = textarea.value.substring(start, end);
+    
+    const newText = before + selectedText + after;
+    
+    textarea.value = textarea.value.substring(0, start) + newText + textarea.value.substring(end);
+    
+    // Posicionar cursor
+    const newCursorPos = start + before.length + selectedText.length + after.length;
+    textarea.setSelectionRange(newCursorPos, newCursorPos);
+    textarea.focus();
+    
+    atualizarContadores();
+    atualizarTagsPreview();
+}
+
+function togglePreview() {
+    const editorContainer = document.getElementById('editorContainer');
+    const previewContainer = document.getElementById('previewContainer');
+    const previewBtn = document.getElementById('previewBtn');
+    
+    previewMode = !previewMode;
+    
+    if (previewMode) {
+        editorContainer.style.display = 'none';
+        previewContainer.style.display = 'block';
+        previewBtn.innerHTML = '<i class="fas fa-edit"></i> Editar';
+        
+        gerarPreview();
+    } else {
+        editorContainer.style.display = 'block';
+        previewContainer.style.display = 'none';
+        previewBtn.innerHTML = '<i class="fas fa-eye"></i> Visualizar';
+    }
+}
+
+function gerarPreview() {
+    const title = document.getElementById('title').value;
+    const content = document.getElementById('content').value;
+    const previewContent = document.getElementById('previewContent');
+    
+    let html = '';
+    
+    if (title) {
+        html += `<h1>${escapeHtml(title)}</h1>`;
+    }
+    
+    if (content) {
+        // Conversão simples de markdown
+        let processedContent = escapeHtml(content);
+        
+        // Negrito
+        processedContent = processedContent.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        
+        // Itálico
+        processedContent = processedContent.replace(/\*(.*?)\*/g, '<em>$1</em>');
+        
+        // Código inline
+        processedContent = processedContent.replace(/`(.*?)`/g, '<code>$1</code>');
+        
+        // Tags
+        processedContent = processedContent.replace(/#(\w+)/g, '<span class="tag-preview">#$1</span>');
+        
+        // Links para notas
+        processedContent = processedContent.replace(/\[\[([^\]]+)\]\]/g, '<span style="color: #3498db; text-decoration: underline;">$1</span>');
+        
+        // Quebras de linha
+        processedContent = processedContent.replace(/\n/g, '<br>');
+        
+        html += `<div>${processedContent}</div>`;
+    }
+    
+    if (!html) {
+        html = '<p style="color: rgba(255, 255, 255, 0.5); font-style: italic;">Nenhum conteúdo para visualizar</p>';
+    }
+    
+    previewContent.innerHTML = html;
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+
+document.addEventListener('keydown', function(e) {
+    
+    if (e.ctrlKey && e.key === 's') {
+        e.preventDefault();
+        document.getElementById('notaForm').dispatchEvent(new Event('submit'));
+    }
+    
+    
+    if (e.ctrlKey && e.key === 'p') {
+        e.preventDefault();
+        togglePreview();
+    }
+});
+</script>
+{% endblock %}
+

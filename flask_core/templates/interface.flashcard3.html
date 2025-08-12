@@ -1,0 +1,603 @@
+{% extends "base.html" %}
+
+{% block title %}Estudar Flashcards - Zetria{% endblock %}
+
+{% block navbar %}
+{% include 'partials/navbar.html' %}
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.main-content {
+    padding: 2rem;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.page-title {
+    color: #ffd700;
+    font-size: 2rem;
+    margin: 0;
+}
+
+.btn-back {
+    padding: 0.75rem 1.5rem;
+    background: rgba(255, 215, 0, 0.1);
+    color: #ffd700;
+    border: 2px solid #ffd700;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-back:hover {
+    background: rgba(255, 215, 0, 0.2);
+    transform: translateY(-2px);
+}
+
+.study-container {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 2rem;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 215, 0, 0.2);
+}
+
+.progress-bar {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    height: 8px;
+    margin-bottom: 1rem;
+    overflow: hidden;
+}
+
+.progress-fill {
+    background: linear-gradient(90deg, #ffd700, #ffed4e);
+    height: 100%;
+    border-radius: 10px;
+    transition: width 0.3s ease;
+    width: 0%;
+}
+
+.study-stats {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    font-size: 0.9rem;
+    color: #888;
+}
+
+.stat-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.stat-value {
+    color: #ffd700;
+    font-weight: 600;
+}
+
+.flashcard-study {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 3rem 2rem;
+    border: 2px solid rgba(255, 215, 0, 0.2);
+    min-height: 300px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-bottom: 2rem;
+}
+
+.flashcard-study:hover {
+    border-color: #ffd700;
+    transform: scale(1.02);
+}
+
+.flashcard-study.flipped {
+    background: rgba(255, 215, 0, 0.05);
+}
+
+.flashcard-content {
+    font-size: 1.3rem;
+    line-height: 1.6;
+    color: #e0e0e0;
+    max-width: 100%;
+    word-wrap: break-word;
+}
+
+.flip-indicator {
+    position: absolute;
+    bottom: 1rem;
+    right: 1rem;
+    color: #ffd700;
+    font-size: 0.9rem;
+    opacity: 0.7;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.study-controls {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.btn-control {
+    padding: 1rem 2rem;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1rem;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #ffd700, #ffed4e);
+    color: #1a1a2e;
+}
+
+.btn-primary:hover:not(:disabled) {
+    background: linear-gradient(135deg, #ffed4e, #ffd700);
+    transform: translateY(-2px);
+}
+
+.btn-secondary {
+    background: rgba(255, 215, 0, 0.1);
+    color: #ffd700;
+    border: 2px solid #ffd700;
+}
+
+.btn-secondary:hover:not(:disabled) {
+    background: rgba(255, 215, 0, 0.2);
+    transform: translateY(-2px);
+}
+
+.btn-control:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.difficulty-buttons {
+    display: none;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.difficulty-buttons.show {
+    display: flex;
+}
+
+.btn-difficulty {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+}
+
+.btn-easy {
+    background: #28a745;
+    color: white;
+}
+
+.btn-easy:hover {
+    background: #218838;
+    transform: translateY(-2px);
+}
+
+.btn-medium {
+    background: #ffc107;
+    color: #1a1a2e;
+}
+
+.btn-medium:hover {
+    background: #e0a800;
+    transform: translateY(-2px);
+}
+
+.btn-hard {
+    background: #dc3545;
+    color: white;
+}
+
+.btn-hard:hover {
+    background: #c82333;
+    transform: translateY(-2px);
+}
+
+.study-complete {
+    text-align: center;
+    padding: 3rem 2rem;
+    display: none;
+}
+
+.study-complete.show {
+    display: block;
+}
+
+.complete-icon {
+    font-size: 4rem;
+    color: #ffd700;
+    margin-bottom: 1rem;
+}
+
+.complete-title {
+    color: #ffd700;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.complete-stats {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+    border: 1px solid rgba(255, 215, 0, 0.2);
+}
+
+.complete-actions {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.no-flashcards {
+    text-align: center;
+    padding: 3rem 2rem;
+    color: #888;
+}
+
+.no-flashcards i {
+    font-size: 4rem;
+    color: #ffd700;
+    margin-bottom: 1rem;
+}
+
+.no-flashcards h3 {
+    color: #ffd700;
+    margin-bottom: 0.5rem;
+}
+
+@media (max-width: 768px) {
+    .main-content {
+        padding: 1rem;
+    }
+    
+    .page-header {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: stretch;
+    }
+    
+    .study-stats {
+        flex-direction: column;
+        gap: 0.5rem;
+        text-align: center;
+    }
+    
+    .study-controls, .difficulty-buttons, .complete-actions {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .flashcard-study {
+        padding: 2rem 1rem;
+        min-height: 250px;
+    }
+    
+    .flashcard-content {
+        font-size: 1.1rem;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="main-content">
+    <div class="page-header">
+        <h1 class="page-title">
+            <i class="fas fa-brain"></i>
+            Estudar Flashcards
+        </h1>
+        <a href="/flashcards" class="btn-back">
+            <i class="fas fa-arrow-left"></i>
+            Voltar
+        </a>
+    </div>
+
+    
+    <div id="study-area" class="study-container" style="display: none;">
+        <div class="progress-bar">
+            <div class="progress-fill" id="progress-fill"></div>
+        </div>
+        
+        <div class="study-stats">
+            <div class="stat-item">
+                <i class="fas fa-layer-group"></i>
+                <span>Total: <span class="stat-value" id="total-cards">0</span></span>
+            </div>
+            <div class="stat-item">
+                <i class="fas fa-eye"></i>
+                <span>Atual: <span class="stat-value" id="current-card">0</span></span>
+            </div>
+            <div class="stat-item">
+                <i class="fas fa-clock"></i>
+                <span>Restantes: <span class="stat-value" id="remaining-cards">0</span></span>
+            </div>
+        </div>
+
+        <div class="flashcard-study" id="flashcard-display" onclick="flipCard()">
+            <div class="flashcard-content" id="card-content">
+                Clique para começar...
+            </div>
+            <div class="flip-indicator">
+                <i class="fas fa-sync-alt"></i>
+                <span id="flip-text">Clique para ver a resposta</span>
+            </div>
+        </div>
+
+        <div class="study-controls">
+            <button class="btn-secondary" id="prev-btn" onclick="previousCard()" disabled>
+                <i class="fas fa-chevron-left"></i>
+                Anterior
+            </button>
+            <button class="btn-primary" id="flip-btn" onclick="flipCard()">
+                <i class="fas fa-sync-alt"></i>
+                Mostrar Resposta
+            </button>
+            <button class="btn-secondary" id="next-btn" onclick="nextCard()" disabled>
+                Próximo
+                <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+
+        <div class="difficulty-buttons" id="difficulty-buttons">
+            <button class="btn-difficulty btn-easy" onclick="rateCard('easy')">
+                <i class="fas fa-smile"></i>
+                Fácil
+            </button>
+            <button class="btn-difficulty btn-medium" onclick="rateCard('medium')">
+                <i class="fas fa-meh"></i>
+                Médio
+            </button>
+            <button class="btn-difficulty btn-hard" onclick="rateCard('hard')">
+                <i class="fas fa-frown"></i>
+                Difícil
+            </button>
+        </div>
+    </div>
+
+    
+    <div id="study-complete" class="study-complete">
+        <div class="complete-icon">
+            <i class="fas fa-trophy"></i>
+        </div>
+        <h2 class="complete-title">Parabéns! Estudo Concluído!</h2>
+        <p>Você terminou de estudar todos os flashcards disponíveis.</p>
+        
+        <div class="complete-stats">
+            <div class="stat-item">
+                <i class="fas fa-layer-group"></i>
+                <span>Flashcards estudados: <span class="stat-value" id="studied-count">0</span></span>
+            </div>
+        </div>
+
+        <div class="complete-actions">
+            <button class="btn-primary" onclick="restartStudy()">
+                <i class="fas fa-redo"></i>
+                Estudar Novamente
+            </button>
+            <a href="/flashcards" class="btn-secondary">
+                <i class="fas fa-list"></i>
+                Ver Flashcards
+            </a>
+        </div>
+    </div>
+
+    
+    <div id="no-flashcards" class="no-flashcards">
+        <i class="fas fa-layer-group"></i>
+        <h3>Nenhum flashcard disponível</h3>
+        <p>Você precisa criar flashcards antes de poder estudar.</p>
+        <a href="/flashcards/novo" class="btn-primary">
+            <i class="fas fa-plus"></i>
+            Criar Primeiro Flashcard
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/zetria-api.js') }}"></script>
+<script src="{{ url_for('static', filename='js/flashcards-api.js') }}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const studyArea = document.getElementById('study-area');
+    const studyComplete = document.getElementById('study-complete');
+    const noFlashcards = document.getElementById('no-flashcards');
+    const cardContent = document.getElementById('card-content');
+    const flipText = document.getElementById('flip-text');
+    const difficultyButtons = document.getElementById('difficulty-buttons');
+    const flipBtn = document.getElementById('flip-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const prevBtn = document.getElementById('prev-btn');
+    
+    let currentFlashcard = null;
+    let showingAnswer = false;
+    let studyStarted = false;
+
+    
+    inicializarEstudo();
+
+    
+    async function inicializarEstudo() {
+        try {
+            await flashcardManager.carregarFlashcards();
+            
+            if (flashcardManager.flashcardsCarregados.length === 0) {
+                noFlashcards.style.display = 'block';
+                return;
+            }
+
+            
+            currentFlashcard = flashcardManager.iniciarEstudo();
+            studyStarted = true;
+            
+            studyArea.style.display = 'block';
+            mostrarFlashcard();
+            atualizarEstatisticas();
+            
+        } catch (error) {
+            console.error('Erro ao inicializar estudo:', error);
+            mostrarNotificacaoFlashcard('Erro ao carregar flashcards: ' + error.message, 'error');
+            noFlashcards.style.display = 'block';
+        }
+    }
+
+    
+    function mostrarFlashcard() {
+        if (!currentFlashcard) {
+            finalizarEstudo();
+            return;
+        }
+
+        cardContent.textContent = currentFlashcard.front_content;
+        flipText.textContent = 'Clique para ver a resposta';
+        showingAnswer = false;
+        
+        // Resetar aparência
+        document.getElementById('flashcard-display').classList.remove('flipped');
+        difficultyButtons.classList.remove('show');
+        
+        // Atualizar botões
+        flipBtn.style.display = 'inline-flex';
+        nextBtn.disabled = true;
+        
+        // Botão anterior
+        const stats = flashcardManager.obterEstatisticas();
+        prevBtn.disabled = stats.atual <= 1;
+    }
+
+    
+    window.flipCard = function() {
+        if (!studyStarted || !currentFlashcard) return;
+        
+        if (!showingAnswer) {
+            // Mostrar resposta
+            cardContent.textContent = currentFlashcard.back_content;
+            flipText.textContent = 'Clique para ver a pergunta';
+            showingAnswer = true;
+            
+            document.getElementById('flashcard-display').classList.add('flipped');
+            difficultyButtons.classList.add('show');
+            flipBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Mostrar Pergunta';
+            nextBtn.disabled = false;
+            
+        } else {
+            // Mostrar pergunta
+            cardContent.textContent = currentFlashcard.front_content;
+            flipText.textContent = 'Clique para ver a resposta';
+            showingAnswer = false;
+            
+            document.getElementById('flashcard-display').classList.remove('flipped');
+            difficultyButtons.classList.remove('show');
+            flipBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Mostrar Resposta';
+            nextBtn.disabled = true;
+        }
+    };
+
+    
+    window.nextCard = function() {
+        if (!studyStarted) return;
+        
+        currentFlashcard = flashcardManager.proximoFlashcard();
+        
+        if (currentFlashcard) {
+            mostrarFlashcard();
+            atualizarEstatisticas();
+        } else {
+            finalizarEstudo();
+        }
+    };
+
+    
+    window.previousCard = function() {
+        if (!studyStarted) return;
+        
+        currentFlashcard = flashcardManager.flashcardAnterior();
+        
+        if (currentFlashcard) {
+            mostrarFlashcard();
+            atualizarEstatisticas();
+        }
+    };
+
+    
+    window.rateCard = function(difficulty) {
+        // implementar lógica de repetição espaçada (futuramente)
+        // Por enquanto, apenas avança para o próximo
+        mostrarNotificacaoFlashcard(`Flashcard marcado como ${difficulty}`, 'info');
+        nextCard();
+    };
+
+    
+    function atualizarEstatisticas() {
+        const stats = flashcardManager.obterEstatisticas();
+        
+        document.getElementById('total-cards').textContent = stats.total;
+        document.getElementById('current-card').textContent = stats.atual;
+        document.getElementById('remaining-cards').textContent = stats.restantes;
+        document.getElementById('progress-fill').style.width = stats.progresso + '%';
+    }
+
+    
+    function finalizarEstudo() {
+        studyArea.style.display = 'none';
+        studyComplete.classList.add('show');
+        
+        const stats = flashcardManager.obterEstatisticas();
+        document.getElementById('studied-count').textContent = stats.total;
+        
+        studyStarted = false;
+    }
+
+    
+    window.restartStudy = function() {
+        studyComplete.classList.remove('show');
+        flashcardManager.resetarEstudo();
+        inicializarEstudo();
+    };
+});
+</script>
+{% endblock %}
+

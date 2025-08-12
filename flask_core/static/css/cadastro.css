@@ -1,0 +1,170 @@
+@import url(font/CalSans-Regular.ttf);
+
+body {
+    margin: 0;
+    font-family: 'CalSans-Regular', sans-serif;
+}
+
+body * {
+    box-sizing: border-box;
+}
+
+a{
+    text-decoration: none;
+    color: #ffcc00;;
+}
+.main-Cadastro {
+    width: 100vw;
+    height: 100vh;
+    background-color: #1e1e2f;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.left-Cadastro {
+    width: 50vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    animation: flutuar 3s ease-in-out infinite;
+}
+
+.left-Cadastro>h1 {
+    font-size: 2vw;
+    color: #ffcc00;
+
+}
+
+.left-Cadastro-img {
+    width: 20vw;
+
+}
+
+.right-Cadastro {
+    width: 50vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.r-card-Cadastro {
+    width: 60%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    padding: 30px 35px;
+    background: #2e2e3f;
+    border-radius: 20px;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+}
+
+.r-card-Cadastro>h1 {
+    color: #ffcc00;
+    font-weight: 800;
+    margin: 0;
+}
+
+.textfield {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    margin: 10px 0px;
+}
+
+.textfield>input {
+    width: 100%;
+    border: none;
+    border-radius: 10px;
+    padding: 15px;
+    background: #2e2e3f;
+    color: aliceblue;
+    font-size: 12pt;
+    box-shadow: 0px 10px 40px #00000056;
+    outline: none;
+    box-sizing: border-box;
+}
+
+.textfield>label {
+    color: aliceblue;
+    margin-bottom: 10px;
+    font-size: 12pt;
+}
+
+.textfield>input ::placeholder {
+    color: #1e1e2f;
+}
+
+
+.btn-cadastro {
+    width: 100%;
+    border: none;
+    border-radius: 8px;
+    padding: 16px 0px;
+    margin: 25px;
+    background: #ffcc00;
+    color: #1e1e2f;
+    text-transform: uppercase;
+    font-weight: 800;
+    font-size: 20=pt;
+    outline: none;
+    letter-spacing: 3px;
+    cursor: pointer;
+    box-shadow: 0px 10px 40px -12px #fbff0052;
+}
+
+.btn-login:hover {
+    background: rgb(255, 213, 0);
+}
+
+@media only screen and (max-width: 950px) {
+    .r-card-Cadastro {
+        width: 85vw;
+    }
+}
+
+@media only screen and (max-width: 600px) {
+    .main-Cadastro {
+        flex-direction: column;
+    }
+
+    .left-Cadastro>h1 {
+        display: none;
+    }
+
+    .left-Cadastro {
+        width: 100%;
+        height: auto;
+    }
+
+    .right-Cadastro {
+        width: 100%;
+        height: auto;
+    }
+
+    .left-Cadastro-img {
+        width: 50vw;
+    }
+
+    .r-card-Cadastro {
+        width: 90%;
+    }
+}
+@keyframes flutuar {
+    0% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+    100% {
+      transform: translateY(0);
+    }
+  }
+  

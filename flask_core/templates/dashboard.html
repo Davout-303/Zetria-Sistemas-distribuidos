@@ -1,0 +1,501 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Zetria{% endblock %}
+
+{% block navbar %}
+{% include 'partials/navbar.html' %}
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.dashboard-container {
+    padding: 40px 0;
+}
+
+.welcome-section {
+    text-align: center;
+    margin-bottom: 48px;
+}
+
+.welcome-section h1 {
+    font-size: 36px;
+    margin-bottom: 12px;
+    background: linear-gradient(135deg, #ffcc00 0%, #ff9900 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.welcome-section p {
+    font-size: 18px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 24px;
+    margin-bottom: 48px;
+}
+
+.dashboard-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 32px;
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+}
+
+.dashboard-card:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 204, 0, 0.3);
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+}
+
+.card-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.card-icon {
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, #ffcc00 0%, #ff9900 100%);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    color: #1e1e2f;
+}
+
+.card-title {
+    font-size: 24px;
+    font-weight: 600;
+    color: #ffffff;
+}
+
+.card-content {
+    margin-bottom: 24px;
+}
+
+.card-stats {
+    display: flex;
+    gap: 24px;
+    margin-bottom: 16px;
+}
+
+.stat-item {
+    text-align: center;
+}
+
+.stat-number {
+    font-size: 28px;
+    font-weight: bold;
+    color: #ffcc00;
+    display: block;
+}
+
+.stat-label {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.recent-items {
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.recent-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.recent-item:last-child {
+    border-bottom: none;
+}
+
+.recent-item-icon {
+    width: 32px;
+    height: 32px;
+    background: rgba(255, 204, 0, 0.2);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    color: #ffcc00;
+}
+
+.recent-item-content {
+    flex: 1;
+}
+
+.recent-item-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: #ffffff;
+    margin-bottom: 4px;
+}
+
+.recent-item-meta {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.empty-state i {
+    font-size: 48px;
+    color: rgba(255, 255, 255, 0.3);
+    margin-bottom: 16px;
+}
+
+.empty-state p {
+    margin-bottom: 16px;
+}
+
+.quick-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.action-btn {
+    flex: 1;
+    min-width: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 16px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.action-btn:hover {
+    background: rgba(255, 204, 0, 0.1);
+    border-color: rgba(255, 204, 0, 0.3);
+    color: #ffcc00;
+    transform: translateY(-2px);
+}
+
+.action-btn.primary {
+    background: linear-gradient(135deg, #ffcc00 0%, #ff9900 100%);
+    border-color: transparent;
+    color: #1e1e2f;
+}
+
+.action-btn.primary:hover {
+    background: linear-gradient(135deg, #ffdd33 0%, #ffaa00 100%);
+    color: #1e1e2f;
+}
+
+@media (max-width: 768px) {
+    .dashboard-container {
+        padding: 20px 0;
+    }
+    
+    .welcome-section h1 {
+        font-size: 28px;
+    }
+    
+    .welcome-section p {
+        font-size: 16px;
+    }
+    
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .dashboard-card {
+        padding: 24px;
+    }
+    
+    .card-stats {
+        gap: 16px;
+    }
+    
+    .action-btn {
+        min-width: 100px;
+        font-size: 13px;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div class="container">
+        <div class="welcome-section">
+            <h1>Bem-vindo(a), {{ username }}!</h1>
+            <p>Gerencie suas notas, flashcards e tarefas de forma inteligente.</p>
+        </div>
+        
+        <div class="dashboard-grid">
+            
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <div class="card-icon">
+                        <i class="fas fa-sticky-note"></i>
+                    </div>
+                    <h3 class="card-title">Minhas Notas</h3>
+                </div>
+                
+                <div class="card-content">
+                    <div class="card-stats">
+                        <div class="stat-item">
+                            <span class="stat-number" id="totalNotas">0</span>
+                            <span class="stat-label">Total</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number" id="notasRecentes">0</span>
+                            <span class="stat-label">Recentes</span>
+                        </div>
+                    </div>
+                    
+                    <div class="recent-items" id="recentNotas">
+                        <div class="empty-state">
+                            <i class="fas fa-sticky-note"></i>
+                            <p>Nenhuma nota encontrada</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="quick-actions">
+                    <a href="{{ url_for('nova_nota') }}" class="action-btn primary">
+                        <i class="fas fa-plus"></i>
+                        Nova Nota
+                    </a>
+                    <a href="{{ url_for('listar_notas') }}" class="action-btn">
+                        <i class="fas fa-list"></i>
+                        Ver Todas
+                    </a>
+                </div>
+            </div>
+            
+            
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <div class="card-icon">
+                        <i class="fas fa-layer-group"></i>
+                    </div>
+                    <h3 class="card-title">Flashcards</h3>
+                </div>
+                
+                <div class="card-content">
+                    <div class="card-stats">
+                        <div class="stat-item">
+                            <span class="stat-number">0</span>
+                            <span class="stat-label">Baralhos</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">0</span>
+                            <span class="stat-label">Cards</span>
+                        </div>
+                    </div>
+                    
+                    <div class="empty-state">
+                        <i class="fas fa-layer-group"></i>
+                        <p>Nenhum flashcard criado</p>
+                    </div>
+                </div>
+                
+                <div class="quick-actions">
+                    <a href="{{ url_for('novo_flashcard') }}" class="action-btn primary">
+                        <span class="btn-icon">+</span>
+                        Novo Baralho
+                    </a>
+                    <a href="{{ url_for('estudar_flashcards') }}" class="action-btn">
+                        <span class="btn-icon">▶</span>
+                        Estudar
+                    </a>
+                </div>
+            </div>
+            
+            
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <div class="card-icon">
+                        <i class="fas fa-calendar"></i>
+                    </div>
+                    <h3 class="card-title">Calendário</h3>
+                </div>
+                
+                <div class="card-content">
+                    <div class="card-stats">
+                        <div class="stat-item">
+                            <span class="stat-number">0</span>
+                            <span class="stat-label">Hoje</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">0</span>
+                            <span class="stat-label">Pendentes</span>
+                        </div>
+                    </div>
+                    
+                    <div class="empty-state">
+                        <i class="fas fa-calendar"></i>
+                        <p>Nenhuma tarefa agendada</p>
+                    </div>
+                </div>
+                
+                <div class="quick-actions">
+                    <a href="{{ url_for('calendario') }}" class="action-btn primary">
+                        <span class="btn-icon">+</span>
+                        Nova Tarefa
+                    </a>
+                    <a href="{{ url_for('calendario') }}" class="action-btn">
+                        <span class="btn-icon">📅</span>
+                        Ver Calendário
+                    </a>
+                </div>
+            </div>
+            
+            
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <div class="card-icon">
+                        <i class="fas fa-project-diagram"></i>
+                    </div>
+                    <h3 class="card-title">Grafos de Conhecimento</h3>
+                </div>
+                
+                <div class="card-content">
+                    <div class="card-stats">
+                        <div class="stat-item">
+                            <span class="stat-number">0</span>
+                            <span class="stat-label">Conexões</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">0</span>
+                            <span class="stat-label">Nós</span>
+                        </div>
+                    </div>
+                    
+                    <div class="empty-state">
+                        <i class="fas fa-project-diagram"></i>
+                        <p>Nenhum grafo criado</p>
+                    </div>
+                </div>
+                
+                <div class="quick-actions">
+                    <a href="{{ url_for('grafos') }}" class="action-btn primary">
+                        <i class="fas fa-plus"></i>
+                        Criar Grafo
+                    </a>
+                    <a href="{{ url_for('grafos') }}" class="action-btn">
+                        <i class="fas fa-eye"></i>
+                        Visualizar
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    
+    carregarEstatisticasNotas();
+    
+    async function carregarEstatisticasNotas() {
+        try {
+            const response = await fetch('/api/notas');
+            if (response.ok) {
+                const data = await response.json();
+                if (data.success) {
+                    atualizarEstatisticasNotas(data.notas);
+                }
+            }
+        } catch (error) {
+            console.error('Erro ao carregar estatísticas:', error);
+        }
+    }
+    
+    function atualizarEstatisticasNotas(notas) {
+        const totalNotas = document.getElementById('totalNotas');
+        const notasRecentes = document.getElementById('notasRecentes');
+        const recentNotasContainer = document.getElementById('recentNotas');
+        
+        if (totalNotas) totalNotas.textContent = notas.length;
+        
+        // Calcular notas recentes 
+        const agora = new Date();
+        const seteDiasAtras = new Date(agora.getTime() - 7 * 24 * 60 * 60 * 1000);
+        
+        const notasRecentesList = notas.filter(nota => {
+            const dataNota = new Date(nota.updated_at);
+            return dataNota >= seteDiasAtras;
+        });
+        
+        if (notasRecentes) notasRecentes.textContent = notasRecentesList.length;
+        
+        // Mostrar notas recentes
+        if (recentNotasContainer) {
+            if (notas.length === 0) {
+                recentNotasContainer.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-sticky-note"></i>
+                        <p>Nenhuma nota encontrada</p>
+                        <a href="${window.location.origin}/notas/nova" class="btn btn-primary" style="margin-top: 12px;">
+                            <i class="fas fa-plus"></i>
+                            Criar Primeira Nota
+                        </a>
+                    </div>
+                `;
+            } else {
+                const notasParaMostrar = notas.slice(0, 3); // Mostrar apenas as 3 mais recentes
+                recentNotasContainer.innerHTML = notasParaMostrar.map(nota => `
+                    <div class="recent-item">
+                        <div class="recent-item-icon">
+                            <i class="fas fa-sticky-note"></i>
+                        </div>
+                        <div class="recent-item-content">
+                            <div class="recent-item-title">${nota.title}</div>
+                            <div class="recent-item-meta">
+                                Atualizada em ${formatarData(nota.updated_at)}
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+    }
+    
+    function formatarData(dataString) {
+        const data = new Date(dataString);
+        const agora = new Date();
+        const diffMs = agora - data;
+        const diffDias = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+        
+        if (diffDias === 0) return 'Hoje';
+        if (diffDias === 1) return 'Ontem';
+        if (diffDias < 7) return `${diffDias} dias atrás`;
+        
+        return data.toLocaleDateString('pt-BR');
+    }
+});
+</script>
+{% endblock %}
+

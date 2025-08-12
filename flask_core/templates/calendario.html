@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block title %}Calendário - Zetria{% endblock %}
+
+{% block navbar %}
+{% include 'partials/navbar.html' %}
+{% endblock %}
+
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/calendario.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="calendario-container">
+    <header class="calendario-header">
+        <h1><i class="fas fa-calendar"></i> Calendário</h1>
+    </header>
+
+    <div class="calendario-content">
+        
+        <div class="calendar-wrapper">
+              <div class="calendar-nav">
+            <button class="nav-btn prev" title="Mês Anterior">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <h2 class="month-title">Julho 2025</h2>
+            <button class="nav-btn next" title="Próximo Mês">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+            <button class="today-btn">Hoje</button>
+        </div>
+
+            <div class="calendar-header">
+                <div class="day-header">Dom</div>
+                <div class="day-header">Seg</div>
+                <div class="day-header">Ter</div>
+                <div class="day-header">Qua</div>
+                <div class="day-header">Qui</div>
+                <div class="day-header">Sex</div>
+                <div class="day-header">Sáb</div>
+            </div>
+            <div class="calendar-grid">
+                
+            </div>
+        </div>
+
+        
+        <div class="task-form-container">
+            <h3><i class="fas fa-plus"></i> Adicionar Tarefa</h3>
+            <form id="taskForm" class="task-form">
+                <div class="form-group">
+                    <label for="title">Título</label>
+                    <input type="text" id="title" name="title" required placeholder="Digite o título da tarefa">
+                </div>
+                
+                <div class="form-group">
+                    <label for="description">Descrição</label>
+                    <textarea id="description" name="description" placeholder="Descrição opcional da tarefa"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="due_date">Data e Hora</label>
+                    <input type="datetime-local" id="due_date" name="due_date" required>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i>
+                        Criar Tarefa
+                    </button>
+                    <button type="reset" class="btn btn-secondary">
+                        <i class="fas fa-times"></i>
+                        Limpar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/calendario-api.js') }}"></script>
+{% endblock %}
+
